@@ -17,6 +17,7 @@
 #include "config.h"
 #include "esp_http_client.h"
 #include "esp_log.h"
+#include "esp_crt_bundle.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -226,9 +227,15 @@ static esp_err_t ollama_complete(
     ESP_LOGI(TAG, "Request body (%d bytes): %.300s%s", len, body,
              len > 300 ? "..." : "");
 
+    if (!espclaw_tls_lock(pdMS_TO_TICKS(60000))) {
+        ESP_LOGW(TAG, "TLS lock timeout");
+        free(body);
+        return ESP_ERR_TIMEOUT;
+    }
+
     /* Allocate response buffer */
     char *resp = malloc(LLM_RESPONSE_BUF_SIZE);
-    if (!resp) { free(body); return ESP_ERR_NO_MEM; }
+    if (!resp) { espclaw_tls_unlock(); free(body); return ESP_ERR_NO_MEM; }
     resp[0] = '\0';
 
     http_ctx_t ctx = { .buf = resp, .buf_sz = LLM_RESPONSE_BUF_SIZE };
@@ -237,6 +244,7 @@ static esp_err_t ollama_complete(
         .url              = s_base_url,
         .method           = HTTP_METHOD_POST,
         .timeout_ms       = LLM_HTTP_TIMEOUT_MS,
+        .crt_bundle_attach= esp_crt_bundle_attach,
         .event_handler    = http_event_handler,
         .user_data        = &ctx,
         .buffer_size      = 2048,
@@ -244,7 +252,7 @@ static esp_err_t ollama_complete(
     };
 
     esp_http_client_handle_t client = esp_http_client_init(&cfg);
-    if (!client) { free(body); free(resp); return ESP_FAIL; }
+    if (!client) { espclaw_tls_unlock(); free(body); free(resp); return ESP_FAIL; }
 
     esp_http_client_set_header(client, "content-type", "application/json; charset=utf-8");
     esp_http_client_set_post_field(client, body, len);
@@ -258,6 +266,7 @@ static esp_err_t ollama_complete(
     }
 
     esp_http_client_cleanup(client);
+    espclaw_tls_unlock();
     free(body);
 
     if (err != ESP_OK || status != 200) {
