@@ -127,7 +127,10 @@ static void serial_input_task(void *arg)
                 } else {
                     /* Forward to agent via inbound queue */
                     inbound_msg_t msg = {0};
-                    strncpy(msg.text, line, sizeof(msg.text) - 1);
+                    size_t line_len = strlen(line);
+                    if (line_len > sizeof(msg.text) - 1) line_len = sizeof(msg.text) - 1;
+                    memcpy(msg.text, line, line_len);
+                    msg.text[line_len] = '\0';
                     msg.source = MSG_SOURCE_SERIAL;
                     msg.chat_id = 0;
                     message_bus_post_inbound(s_bus, &msg, pdMS_TO_TICKS(100));

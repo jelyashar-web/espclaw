@@ -93,8 +93,15 @@ esp_err_t wifi_mgr_init_and_connect(void)
         IP_EVENT, IP_EVENT_STA_GOT_IP, &event_handler, NULL, &instance_got_ip));
 
     wifi_config_t wifi_config = {0};
-    strncpy((char *)wifi_config.sta.ssid, ssid, sizeof(wifi_config.sta.ssid) - 1);
-    strncpy((char *)wifi_config.sta.password, pass, sizeof(wifi_config.sta.password) - 1);
+    size_t ssid_len = strlen(ssid);
+    if (ssid_len > sizeof(wifi_config.sta.ssid) - 1) ssid_len = sizeof(wifi_config.sta.ssid) - 1;
+    memcpy(wifi_config.sta.ssid, ssid, ssid_len);
+    wifi_config.sta.ssid[ssid_len] = '\0';
+
+    size_t pass_len = strlen(pass);
+    if (pass_len > sizeof(wifi_config.sta.password) - 1) pass_len = sizeof(wifi_config.sta.password) - 1;
+    memcpy(wifi_config.sta.password, pass, pass_len);
+    wifi_config.sta.password[pass_len] = '\0';
 
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
