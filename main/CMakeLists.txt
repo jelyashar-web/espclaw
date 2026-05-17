@@ -16,6 +16,7 @@ set(SRCS
     "provider/provider_registry.c"
     "provider/provider_anthropic.c"
     "provider/provider_openai.c"
+    "provider/provider_ollama.c"
     # Agent loop
     "agent/agent_loop.c"
     # ReAct agent modules

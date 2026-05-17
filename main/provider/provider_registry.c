@@ -32,9 +32,9 @@ esp_err_t provider_registry_init(void)
             return openrouter_provider.init(creds.api_key, creds.model,
                                             url ? url : LLM_API_URL_OPENROUTER);
         case LLM_BACKEND_OLLAMA:
-            s_active = &ollama_provider;
-            return ollama_provider.init(creds.api_key, creds.model,
-                                        url ? url : LLM_API_URL_OLLAMA);
+            s_active = &ollama_native_provider;
+            return ollama_native_provider.init(creds.api_key, creds.model,
+                                               url ? url : LLM_API_URL_OLLAMA);
         case LLM_BACKEND_ANTHROPIC:
             s_active = &anthropic_provider;
             return anthropic_provider.init(creds.api_key, creds.model,

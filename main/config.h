@@ -111,7 +111,7 @@ typedef enum {
 #define LLM_API_URL_ANTHROPIC    "https://api.anthropic.com/v1/messages"
 #define LLM_API_URL_OPENAI       "https://api.openai.com/v1/chat/completions"
 #define LLM_API_URL_OPENROUTER   "https://openrouter.ai/api/v1/chat/completions"
-#define LLM_API_URL_OLLAMA       "http://127.0.0.1:11434/v1/chat/completions"
+#define LLM_API_URL_OLLAMA       "http://192.168.7.12:11434/api/generate"
 
 #define LLM_DEFAULT_MODEL_ANTHROPIC  "claude-haiku-4-5-20251001"
 #define LLM_DEFAULT_MODEL_OPENAI     "gpt-4o-mini"

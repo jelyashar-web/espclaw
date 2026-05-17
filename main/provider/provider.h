@@ -47,5 +47,6 @@ extern const provider_ops_t anthropic_provider;
 extern const provider_ops_t openai_provider;
 extern const provider_ops_t openrouter_provider;
 extern const provider_ops_t ollama_provider;
+extern const provider_ops_t ollama_native_provider;
 
 #endif /* PROVIDER_H */
